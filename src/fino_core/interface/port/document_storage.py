@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from fino_core.domain.entity.document import Document
 
 
-class DocumentStorage(ABC):
+class DocumentStoragePort(ABC):
     @abstractmethod
     def save(self, document: Document, file: bytes) -> None: ...
 

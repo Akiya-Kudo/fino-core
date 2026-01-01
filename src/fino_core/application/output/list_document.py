@@ -5,4 +5,5 @@ from fino_core.domain.entity.document import Document
 
 @dataclass(frozen=True, slots=True)
 class ListDocumentOutput:
-    document_list: list[Document]
+    available_documents: list[Document]
+    stored_documents: list[Document]
