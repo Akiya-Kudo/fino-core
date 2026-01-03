@@ -24,7 +24,7 @@
 インフラストラクチャへの依存を抽象化するため、Port インターフェースを定義しています：
 
 - `DisclosureSourcePort`: データソースとの通信を抽象化
-- `DocumentStoragePort`: ストレージへのアクセスを抽象化
+- `StoragePort`: ストレージへのアクセスを抽象化
 - `DocumentRepository`: リポジトリパターンでデータアクセスを抽象化
 
 ## 公開 API 構造
@@ -54,7 +54,7 @@
 #### Ports（実装が必要）
 
 - `DisclosureSourcePort`: データソースインターフェース
-- `DocumentStoragePort`: ストレージインターフェース
+- `StoragePort`: ストレージインターフェース
 - `DocumentRepository`: リポジトリインターフェース
 
 #### Utilities
@@ -204,7 +204,7 @@ def list_documents(
 ┌─────────────────▼───────────────────────┐
 │     Interface Layer (Ports)             │
 │     - DisclosureSourcePort              │
-│     - DocumentStoragePort               │ ← インターフェース定義
+│     - StoragePort               │ ← インターフェース定義
 │     - DocumentRepository                │
 └─────────────────┬───────────────────────┘
                   │

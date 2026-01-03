@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from fino_core.infrastructure.adapter.storage.local import LocalStorage
-from fino_core.interface.port.document_storage import DocumentStoragePort
+from fino_core.interface.port.document_storage import StoragePort
 
 
 class TestLocalStorage:
@@ -20,7 +20,7 @@ class TestLocalStorage:
 
     ########## instance check ##########
     def test_implements_document_storage_port(self, storage: LocalStorage) -> None:
-        assert isinstance(storage, DocumentStoragePort)
+        assert isinstance(storage, StoragePort)
 
     ########## exists method ##########
 

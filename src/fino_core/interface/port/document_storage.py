@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class DocumentStoragePort(ABC):
+class StoragePort(ABC):
     @abstractmethod
     def exists(self, path: str) -> bool: ...
 

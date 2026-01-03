@@ -1,9 +1,9 @@
 from pathlib import Path
 
-from fino_core.interface.port.document_storage import DocumentStoragePort
+from fino_core.interface.port.document_storage import StoragePort
 
 
-class LocalStorage(DocumentStoragePort):
+class LocalStorage(StoragePort):
     def __init__(self, base_dir: str) -> None:
         self.base_dir = Path(base_dir).expanduser().resolve()
 
@@ -17,7 +17,9 @@ class LocalStorage(DocumentStoragePort):
         saved_bytes = target_path.write_bytes(file)
 
         if saved_bytes != len(file):
-            raise IOError(f"Incomplete write detected: {saved_bytes} != {len(file)}: {path}")
+            raise IOError(
+                f"Incomplete write detected: {saved_bytes} != {len(file)}: {path}"
+            )
 
     def _resolve(self, path: str | Path) -> Path:
         p = Path(path)
