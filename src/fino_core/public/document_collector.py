@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, Optional, cast
 
 from fino_core.application.input.collect_document import CollectDocumentInput
 from fino_core.application.input.list_document import ListDocumentInput
@@ -6,6 +6,7 @@ from fino_core.application.interactor.collect_document import CollectDocumentUse
 from fino_core.application.interactor.list_document import ListDocumentUseCase
 from fino_core.domain.entity.document import Document
 from fino_core.domain.repository.document import DocumentSearchCriteria
+from fino_core.domain.value.format_type import FormatType, FormatTypeEnum
 from fino_core.domain.value.market import Market, MarketEnum
 from fino_core.infrastructure.adapter.disclosure_source.edinet import (
     EdinetDocumentSearchCriteria,
@@ -30,15 +31,26 @@ class DocumentCollector:
         self._document_repository = DocumentRepositoryImpl(storage)
 
     def list_document(
-        self, timescope: TimeScope
+        self,
+        timescope: TimeScope,
+        format_type: Optional[FormatTypeEnum] = FormatTypeEnum.XBRL,
     ) -> dict[
         Literal["available_document_list", "stored_document_list"], list[Document]
     ]:
+        # validation
+        if format_type is None:
+            raise ValueError(
+                "format_type must not None. please specify format_type or use default value (XBRL)"
+            )
+
         usecase = ListDocumentUseCase(self._document_repository)
 
-        criteria = EdinetDocumentSearchCriteria(
-            market=Market(enum=MarketEnum.JP), timescope=timescope
+        edinet_criteria = EdinetDocumentSearchCriteria(
+            market=Market(enum=MarketEnum.JP),
+            format_type=FormatType(enum=format_type),
+            timescope=timescope,
         )
+        criteria = cast(DocumentSearchCriteria, edinet_criteria)
         input = ListDocumentInput(
             disclosure_source=self._disclosure_source, criteria=criteria
         )
