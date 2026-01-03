@@ -1,14 +1,33 @@
+from pathlib import Path
+
 from fino_core.interface.port.document_storage import DocumentStoragePort
 
 
 class LocalStorage(DocumentStoragePort):
-    def __init__(self, absolute_path: str) -> None:
-        self.absolute_path = absolute_path
+    def __init__(self, base_dir: str) -> None:
+        self.base_dir = Path(base_dir).expanduser().resolve()
 
-    def save(self, document: Document, file: bytes) -> None:
-        with open(self.absolute_path, "wb") as f:
-            f.write(file)
+    def exists(self, path: str) -> bool:
+        target_path = self._resolve(path)
+        return target_path.exists()
 
-    def get(self, document: Document) -> bytes:
-        with open(self.absolute_path, "rb") as f:
-            return f.read()
+    def save(self, path: str, file: bytes) -> None:
+        target_path = self._resolve(path)
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+        saved_bytes = target_path.write_bytes(file)
+
+        if saved_bytes != len(file):
+            raise IOError(f"Incomplete write detected: {saved_bytes} != {len(file)}: {path}")
+
+    def _resolve(self, path: str | Path) -> Path:
+        p = Path(path)
+
+        if p.is_absolute():
+            raise ValueError("Absolute path is not allowed")
+
+        full = (self.base_dir / p).resolve()
+
+        if not full.is_relative_to(self.base_dir):
+            raise ValueError("Path traversal detected")
+
+        return full

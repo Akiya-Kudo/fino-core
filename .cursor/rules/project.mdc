@@ -84,13 +84,14 @@ alwaysApply: true
 - **File Name**:
   1. document_id (書類 ID)
   2. disclosure_date（開示日）
+  3. format_type (ファイルフォーマット)
 
 #### EXAMPLE
 
 ---
 
 ```
-s3://finance-storage-bucket.com/disclosures/JP/APPL/AMMENDED_REPORT/XXXXXXXX_2001-10-10
+s3://finance-storage-bucket.com/disclosures/JP/APPL/AMMENDED_REPORT/XXXXXXXX_2001-10-10_xbrl.zip
 
-/Users/hogehoge/data/disclosure/APPL/AMMENDED_REPORT/XXXXXXXX_2001-10-10.csv
+/Users/hogehoge/data/disclosure/APPL/AMMENDED_REPORT/XXXXXXXX_2001-10-10_csv.zip
 ```
