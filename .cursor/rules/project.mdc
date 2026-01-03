@@ -78,12 +78,12 @@ alwaysApply: true
 - パーティション：検索時や、アクセス時のクエリに応じたグルーピングを行う
 - ファイル名：参照時の識別子
 - **Partition**:
-  - market (市場の国別)
-  - ticker (企業 ID)
-  - disclosure_type (開示書類の種別)
+  1. market (市場の国別)
+  2. ticker (企業 ID)
+  3. disclosure_type (開示書類の種別)
 - **File Name**:
-  - document_id (書類 ID)
-  - disclosure_date（開示日）
+  1. document_id (書類 ID)
+  2. disclosure_date（開示日）
 
 #### EXAMPLE
 
