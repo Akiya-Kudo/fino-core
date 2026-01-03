@@ -1,9 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Optional, Protocol
 
 from fino_core.domain.entity.document import Document
 from fino_core.domain.value.document_id import DocumentId
-from fino_core.domain.value.document_search_criteria import DocumentSearchCriteria
+
+
+class DocumentSearchCriteria(Protocol): ...
 
 
 class DocumentRepository(ABC):

@@ -2,14 +2,10 @@ from fino_core.application.input.collect_document import CollectDocumentInput
 from fino_core.application.output.collect_document import CollectDocumentOutput
 from fino_core.domain.entity.document import Document
 from fino_core.domain.repository.document import DocumentRepository
-from fino_core.interface.port.disclosure_source import DisclosureSource
 
 
 class CollectDocumentUseCase:
-    def __init__(
-        self, disclosure_source: DisclosureSource, document_repository: DocumentRepository
-    ) -> None:
-        self.disclosure_source = disclosure_source
+    def __init__(self, document_repository: DocumentRepository) -> None:
         self.document_repository = document_repository
 
     def execute(self, input: CollectDocumentInput) -> CollectDocumentOutput:

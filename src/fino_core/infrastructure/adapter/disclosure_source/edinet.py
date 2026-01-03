@@ -1,12 +1,18 @@
+from dataclasses import dataclass
+
 from fino_core.domain.entity.disclosure_source import DisclosureSource
 from fino_core.domain.entity.document import Document
 from fino_core.domain.value.document_id import DocumentId
-from fino_core.domain.value.document_search_criteria import DocumentSearchCriteria
-from fino_core.interface.port.disclosure_source import DisclosureSourcePort
+from fino_core.util import TimeScope
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class EdinetDocumentSearchCriteria:
+    timescope: TimeScope
 
 
 # FIXME: TODO: 実装
-class EdinetAdapter(DisclosureSourcePort):
+class EdinetAdapter:
     def __init__(self, api_key: str) -> None:
         self.api_key = api_key
 
@@ -16,7 +22,7 @@ class EdinetAdapter(DisclosureSourcePort):
             name="EDINET",
         )
 
-    def list_available_documents(self, criteria: DocumentSearchCriteria) -> list[Document]:
+    def list_available_documents(self, criteria: EdinetDocumentSearchCriteria) -> list[Document]:
         return []
 
     def download_document(self, document_id: DocumentId) -> bytes:
