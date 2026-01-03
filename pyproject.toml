@@ -5,6 +5,7 @@ description = 'Fino Core'
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "boto3>=1.35.0",
     "dynaconf>=3.2.12",
     "pydantic>=2.12.5",
     "python-dateutil>=2.9.0",
@@ -20,5 +21,11 @@ packages = ["src/fino_core"]
 
 
 [dependency-groups]
-lint = ["ruff>=0.14.8", "pytest>=9.0.2"]
-dev = [{ include-group = "lint" }]
+lint = ["ruff>=0.14.8"]
+test = ["pytest>=9.0.2"]
+typing = ["boto3-stubs[s3]>=1.35.0"]
+dev = [
+    { include-group = "lint" },
+    { include-group = "test" },
+    { include-group = "typing" },
+]

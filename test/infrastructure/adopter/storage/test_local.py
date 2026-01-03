@@ -1,12 +1,13 @@
+import os
 import tempfile
 from collections.abc import Generator
 from pathlib import Path
 
 import pytest
-from fino_core.interface.port.storage import StoragePort
 
 from fino_core.infrastructure.adapter.storage.local import LocalStorage
 from fino_core.interface.config.storage import LocalStorageConfig
+from fino_core.interface.port.storage import StoragePort
 
 
 class TestLocalStorage:
@@ -24,12 +25,61 @@ class TestLocalStorage:
         assert isinstance(storage, StoragePort)
 
     def test_base_dir_absolute(self) -> None:
-        storage = LocalStorage(config=LocalStorageConfig(base_dir="/absolute/path"))
-        assert storage.base_dir == Path("/absolute/path")
+        with tempfile.TemporaryDirectory() as tmpdir:
+            absolute_path = Path(tmpdir) / "absolute" / "path"
+            storage = LocalStorage(
+                config=LocalStorageConfig(base_dir=str(absolute_path))
+            )
+            assert storage.base_dir == absolute_path.resolve()
+            assert storage.base_dir.exists()
+            assert storage.base_dir.is_dir()
 
     def test_base_dir_tilde(self) -> None:
         storage = LocalStorage(config=LocalStorageConfig(base_dir="~/tmp"))
         assert storage.base_dir == Path("~/tmp").expanduser().resolve()
+
+    def test_base_dir_relative(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            original_cwd = os.getcwd()
+            try:
+                os.chdir(tmpdir)
+                relative_path = "relative/path"
+                storage = LocalStorage(
+                    config=LocalStorageConfig(base_dir=relative_path)
+                )
+                expected = Path(tmpdir) / relative_path
+                assert storage.base_dir == expected.resolve()
+                assert storage.base_dir.exists()
+                assert storage.base_dir.is_dir()
+            finally:
+                os.chdir(original_cwd)
+
+    def test_base_dir_relative_with_trailing_slash(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            original_cwd = os.getcwd()
+            try:
+                os.chdir(tmpdir)
+                relative_path = "relative/path/"
+                storage = LocalStorage(
+                    config=LocalStorageConfig(base_dir=relative_path)
+                )
+                expected = Path(tmpdir) / "relative/path"
+                assert storage.base_dir == expected.resolve()
+            finally:
+                os.chdir(original_cwd)
+
+    ########## normalize method ERROR ##########
+    def test_normalize_raises_error_on_empty_string(self) -> None:
+        with pytest.raises(ValueError, match="Base directory is required"):
+            _ = LocalStorage(config=LocalStorageConfig(base_dir=""))
+
+    def test_normalize_raises_error_when_path_is_file(self, temp_dir: Path) -> None:
+        test_file = temp_dir / "test_not_dir.txt"
+        _ = test_file.write_text("test")
+        with pytest.raises(
+            NotADirectoryError, match="Base directory is not a directory"
+        ):
+            _ = LocalStorage(config=LocalStorageConfig(base_dir=str(test_file)))
 
     ########## exists method ##########
 
