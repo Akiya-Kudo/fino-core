@@ -1,5 +1,6 @@
+from fino_core.interface.port.storage import StoragePort
+
 from fino_core.domain.entity.document import Document
-from fino_core.interface.port.document_storage import StoragePort
 
 
 # FIXME: TODO: 実装
