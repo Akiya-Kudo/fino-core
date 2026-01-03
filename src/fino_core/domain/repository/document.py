@@ -1,14 +1,14 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
 from typing import Protocol
 
 from fino_core.domain.entity.document import Document
+from fino_core.domain.value.format_type import FormatType
 from fino_core.domain.value.market import Market
 
 
-@dataclass(frozen=True, slots=True)
 class DocumentSearchCriteria(Protocol):
-    market: Market
+    market: Market  # @propertyではなく、フィールドとして
+    format_type: FormatType
 
 
 class DocumentRepository(ABC):
