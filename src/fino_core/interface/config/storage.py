@@ -10,8 +10,9 @@ class S3StorageConfig(BaseModel):
     region: str
     prefix: str | None = None
 
-    @field_validator("prefix", mode="after")
-    def validate_absolute_path(self) -> str:
-        if not self.prefix:
+    @field_validator("prefix", mode="before")
+    @classmethod
+    def normalize_prefix(cls, v: str | None) -> str:
+        if v is None:
             return ""
-        return self.prefix.strip()
+        return v
