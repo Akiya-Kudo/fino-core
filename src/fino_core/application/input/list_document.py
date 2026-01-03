@@ -4,7 +4,7 @@ from fino_core.domain.repository.document import DocumentSearchCriteria
 from fino_core.interface.port.disclosure_source import DisclosureSourcePort
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True, slots=True, kw_only=True)
 class ListDocumentInput:
     disclosure_source: DisclosureSourcePort
     criteria: DocumentSearchCriteria
