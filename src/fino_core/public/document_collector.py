@@ -11,6 +11,7 @@ from fino_core.application.interactor.list_document import ListDocumentUseCase
 from fino_core.domain.entity.document import Document
 from fino_core.infrastructure.factory.disclosure_source import create_disclosure_source
 from fino_core.infrastructure.factory.storage import create_storage
+from fino_core.interface.config.storage import LocalStorageConfig, S3StorageConfig
 from fino_core.util.timescope import TimeScope
 
 
@@ -18,7 +19,7 @@ class DocumentCollector:
     def __init__(
         self,
         disclosure_config: EdinetConfig | TDNetSampleConfig,
-        storage_config: LocalConfig | S3Config,
+        storage_config: LocalStorageConfig | S3StorageConfig,
     ) -> None:
         self._disclosure_source = create_disclosure_source(disclosure_config)
 
