@@ -2,8 +2,14 @@ name: CI Run Tests
 
 on:
   pull_request:
+    paths:
+      - '**.py'
+      - '**.pyi'
+      - 'pyproject.toml'
+      - "uv.lock"
+      - "pyrightconfig.json"
+      - "pytest.toml"
   workflow_dispatch:
-
 
 jobs:
   test:
