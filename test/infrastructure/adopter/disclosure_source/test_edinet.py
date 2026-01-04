@@ -3,10 +3,16 @@ from typing import Any
 from unittest.mock import patch
 
 import pytest
-from fino_core.domain.value.disclosure_source import DisclosureSourceEnum
-from fino_core.domain.value.disclosure_type import DisclosureTypeEnum
+from fino_core.domain.entity.document import Document
+from fino_core.domain.value.disclosure_date import DisclosureDate
+from fino_core.domain.value.disclosure_source import (
+    DisclosureSource,
+    DisclosureSourceEnum,
+)
+from fino_core.domain.value.disclosure_type import DisclosureType, DisclosureTypeEnum
 from fino_core.domain.value.document_id import DocumentId
 from fino_core.domain.value.format_type import FormatType, FormatTypeEnum
+from fino_core.domain.value.ticker import Ticker
 from fino_core.infrastructure.adapter.disclosure_source.edinet import (
     EdinetAdapter,
     EdinetDocumentSearchCriteria,
@@ -280,50 +286,78 @@ class TestEdinetAdapter:
 
     ########## download_document ##########
     def test_download_document_xbrl(self, adapter: EdinetAdapter) -> None:
-        document_id = DocumentId(value="EDINET_S100TEST_XBRL")
-        format_type = FormatType(enum=FormatTypeEnum.XBRL)
+        document = Document(
+            document_id=DocumentId(value="EDINET_S100TEST_XBRL"),
+            filing_name="有価証券報告書",
+            ticker=Ticker(value="12345"),
+            disclosure_type=DisclosureType(enum=DisclosureTypeEnum.ANNUAL_REPORT),
+            disclosure_source=DisclosureSource(enum=DisclosureSourceEnum.EDINET),
+            disclosure_date=DisclosureDate(value=date(2024, 3, 15)),
+            filing_format=FormatType(enum=FormatTypeEnum.XBRL),
+        )
         expected_content = b"xbrl content"
 
         with patch.object(
             adapter.client, "get_document", return_value=expected_content
         ) as mock_get_doc:
-            content = adapter.download_document(document_id, format_type)
+            content = adapter.download_document(document)
 
             assert content == expected_content
-            mock_get_doc.assert_called_once_with(docId="EDINET_S100TEST_XBRL", type=1)
+            mock_get_doc.assert_called_once_with(docId="S100TEST", type=1)
 
     def test_download_document_pdf(self, adapter: EdinetAdapter) -> None:
-        document_id = DocumentId(value="EDINET_S100TEST_PDF")
-        format_type = FormatType(enum=FormatTypeEnum.PDF)
+        document = Document(
+            document_id=DocumentId(value="EDINET_S100TEST_PDF"),
+            filing_name="有価証券報告書",
+            ticker=Ticker(value="12345"),
+            disclosure_type=DisclosureType(enum=DisclosureTypeEnum.ANNUAL_REPORT),
+            disclosure_source=DisclosureSource(enum=DisclosureSourceEnum.EDINET),
+            disclosure_date=DisclosureDate(value=date(2024, 3, 15)),
+            filing_format=FormatType(enum=FormatTypeEnum.PDF),
+        )
         expected_content = b"pdf content"
 
         with patch.object(
             adapter.client, "get_document", return_value=expected_content
         ) as mock_get_doc:
-            content = adapter.download_document(document_id, format_type)
+            content = adapter.download_document(document)
 
             assert content == expected_content
-            mock_get_doc.assert_called_once_with(docId="EDINET_S100TEST_PDF", type=2)
+            mock_get_doc.assert_called_once_with(docId="S100TEST", type=2)
 
     def test_download_document_csv(self, adapter: EdinetAdapter) -> None:
-        document_id = DocumentId(value="EDINET_S100TEST_CSV")
-        format_type = FormatType(enum=FormatTypeEnum.CSV)
+        document = Document(
+            document_id=DocumentId(value="EDINET_S100TEST_CSV"),
+            filing_name="有価証券報告書",
+            ticker=Ticker(value="12345"),
+            disclosure_type=DisclosureType(enum=DisclosureTypeEnum.ANNUAL_REPORT),
+            disclosure_source=DisclosureSource(enum=DisclosureSourceEnum.EDINET),
+            disclosure_date=DisclosureDate(value=date(2024, 3, 15)),
+            filing_format=FormatType(enum=FormatTypeEnum.CSV),
+        )
         expected_content = b"csv content"
 
         with patch.object(
             adapter.client, "get_document", return_value=expected_content
         ) as mock_get_doc:
-            content = adapter.download_document(document_id, format_type)
+            content = adapter.download_document(document)
 
             assert content == expected_content
-            mock_get_doc.assert_called_once_with(docId="EDINET_S100TEST_CSV", type=5)
+            mock_get_doc.assert_called_once_with(docId="S100TEST", type=5)
 
     def test_download_document_unsupported_format(self, adapter: EdinetAdapter) -> None:
-        document_id = DocumentId(value="EDINET_S100TEST_OTHER")
-        format_type = FormatType(enum=FormatTypeEnum.OTHER)
+        document = Document(
+            document_id=DocumentId(value="EDINET_S100TEST_OTHER"),
+            filing_name="有価証券報告書",
+            ticker=Ticker(value="12345"),
+            disclosure_type=DisclosureType(enum=DisclosureTypeEnum.ANNUAL_REPORT),
+            disclosure_source=DisclosureSource(enum=DisclosureSourceEnum.EDINET),
+            disclosure_date=DisclosureDate(value=date(2024, 3, 15)),
+            filing_format=FormatType(enum=FormatTypeEnum.OTHER),
+        )
 
         with pytest.raises(ValueError, match="Unsupported format type"):
-            _ = adapter.download_document(document_id, format_type)
+            _ = adapter.download_document(document)
 
     ########## _generate_document_id ##########
     def test_generate_document_id(self) -> None:
