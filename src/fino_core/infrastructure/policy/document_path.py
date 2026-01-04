@@ -15,7 +15,7 @@ class DocumentPathPolicy:
 
     @property
     def folder(self) -> str:
-        return f"{self.document.market.value}/{self.document.ticker.value}/{self.document.disclosure_type.value}"  # noqa: E501
+        return f"{self.document.disclsoure.value}/{self.document.ticker.value}/{self.document.disclosure_type.value}"  # noqa: E501
 
     @property
     def filename(self) -> str:

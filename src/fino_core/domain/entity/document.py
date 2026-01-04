@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 from fino_core.domain.model import AggregateRoot
 from fino_core.domain.value.disclosure_date import DisclosureDate
+from fino_core.domain.value.disclosure_source import DisclosureSource
 from fino_core.domain.value.disclosure_type import DisclosureType
 from fino_core.domain.value.document_id import DocumentId
 from fino_core.domain.value.format_type import FormatType
@@ -14,6 +15,6 @@ class Document(AggregateRoot):
     filing_name: str
     ticker: Ticker
     disclosure_type: DisclosureType
-    disclosure_source_id: str
+    disclosure_source: DisclosureSource
     disclosure_date: DisclosureDate
-    filing_format_list: FormatType
+    filing_format: FormatType
