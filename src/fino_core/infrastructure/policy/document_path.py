@@ -15,7 +15,7 @@ class DocumentPathPolicy:
 
     @property
     def folder(self) -> str:
-        return f"{self.document.disclsoure.value}/{self.document.ticker.value}/{self.document.disclosure_type.value}"  # noqa: E501
+        return f"{self.document.disclosure_source.value}/{self.document.ticker.value}/{self.document.disclosure_type.value}"  # noqa: E501
 
     @property
     def filename(self) -> str:
@@ -25,7 +25,7 @@ class DocumentPathPolicy:
     @staticmethod
     def generate_path(document: Document, is_zip: bool = False) -> str:
         zip_suffix = ".zip" if is_zip else ""
-        return f"{document.market.value}/{document.ticker.value}/{document.disclosure_type.value}/{document.document_id.value}_{document.disclosure_date.value.isoformat()}_{document.filing_format.value}{zip_suffix}"  # noqa: E501
+        return f"{document.disclosure_source.value}/{document.ticker.value}/{document.disclosure_type.value}/{document.document_id.value}_{document.disclosure_date.value.isoformat()}_{document.filing_format.value}{zip_suffix}"  # noqa: E501
 
     @staticmethod
     def is_zip(path: str) -> bool:

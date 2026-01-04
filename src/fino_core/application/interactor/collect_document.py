@@ -9,9 +9,7 @@ class CollectDocumentUseCase:
         self.document_repository = document_repository
 
     def execute(self, input: CollectDocumentInput) -> CollectDocumentOutput:
-        available_document_list = input.disclosure_source.list_available_documents(
-            input.criteria
-        )
+        available_document_list = input.disclosure_source.list_available_documents(input.criteria)
 
         stored_document_list: list[Document] = []
         for available_document in available_document_list:
@@ -22,8 +20,7 @@ class CollectDocumentUseCase:
         for available_document in available_document_list:
             if available_document not in stored_document_list:
                 file = input.disclosure_source.download_document(
-                    available_document.document_id,
-                    format_type=available_document.filing_format_list,
+                    document=available_document,
                 )
                 self.document_repository.save(available_document, file)
                 collected_documents.append(available_document)
