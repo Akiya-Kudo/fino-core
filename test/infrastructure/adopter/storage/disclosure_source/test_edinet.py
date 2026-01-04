@@ -26,7 +26,7 @@ class TestEdinetAdapter:
         return EdinetAdapter(config=config)
 
     @pytest.fixture
-    def mock_edinet_document(self) -> dict[str, str]:
+    def mock_edinet_document(self) -> dict[str, Any]:
         """EDINET APIのget_document_listのレスポンスのサンプル"""
         return {
             "docID": "S100TEST",
@@ -139,7 +139,9 @@ class TestEdinetAdapter:
             ]
         }
 
-        with patch.object(adapter.client, "get_document_list", return_value=mock_response):
+        with patch.object(
+            adapter.client, "get_document_list", return_value=mock_response
+        ):
             documents = adapter.list_available_documents(criteria)
 
             # CSV対応の書類のみが返される
@@ -181,7 +183,9 @@ class TestEdinetAdapter:
             ]
         }
 
-        with patch.object(adapter.client, "get_document_list", return_value=mock_response):
+        with patch.object(
+            adapter.client, "get_document_list", return_value=mock_response
+        ):
             documents = adapter.list_available_documents(criteria)
 
             # 既知の書類のみが返される
@@ -232,9 +236,9 @@ class TestEdinetAdapter:
         with patch.object(adapter.client, "get_document_list") as mock_get_list:
             # 最初の2日間は異なるレスポンスを返し、残りの日は空のレスポンスを返す
             empty_response: dict[str, list[Any]] = {"results": []}
-            mock_get_list.side_effect = (
-                [mock_response_day1, mock_response_day2] + [empty_response] * 29
-            )
+            mock_get_list.side_effect = [mock_response_day1, mock_response_day2] + [
+                empty_response
+            ] * 29
 
             documents = adapter.list_available_documents(criteria)
 
@@ -254,7 +258,9 @@ class TestEdinetAdapter:
 
         mock_response: dict[str, list[Any]] = {"results": []}
 
-        with patch.object(adapter.client, "get_document_list", return_value=mock_response):
+        with patch.object(
+            adapter.client, "get_document_list", return_value=mock_response
+        ):
             documents = adapter.list_available_documents(criteria)
 
             assert len(documents) == 0
@@ -283,7 +289,9 @@ class TestEdinetAdapter:
             ]
         }
 
-        with patch.object(adapter.client, "get_document_list", return_value=mock_response):
+        with patch.object(
+            adapter.client, "get_document_list", return_value=mock_response
+        ):
             documents = adapter.list_available_documents(criteria)
 
             # 無効なデータは除外される
@@ -364,11 +372,12 @@ class TestEdinetAdapter:
 
     ########## _convert_to_document ##########
     def test_convert_to_document_success(
-        self, adapter: EdinetAdapter, mock_edinet_document: dict[str, str]
+        self, adapter: EdinetAdapter, mock_edinet_document: dict[str, Any]
     ) -> None:
         format_type = FormatType(enum=FormatTypeEnum.XBRL)
-        document = adapter._convert_to_document(  # type: ignore[reportPrivateUsage,arg-type]
-            mock_edinet_document, format_type  # type: ignore[arg-type]
+        document = adapter._convert_to_document(  # type: ignore[reportPrivateUsage]
+            mock_edinet_document,  # type: ignore[arg-type]
+            format_type,
         )
 
         assert document is not None
@@ -381,13 +390,14 @@ class TestEdinetAdapter:
         assert document.filing_format.enum == FormatTypeEnum.XBRL
 
     def test_convert_to_document_returns_none_for_unsupported_format(
-        self, adapter: EdinetAdapter, mock_edinet_document: dict[str, str]
+        self, adapter: EdinetAdapter, mock_edinet_document: dict[str, Any]
     ) -> None:
         """書類が指定されたフォーマットに対応していない場合はNoneを返す"""
         # CSV非対応の書類
         format_type = FormatType(enum=FormatTypeEnum.CSV)
-        document = adapter._convert_to_document(  # type: ignore[reportPrivateUsage,arg-type]
-            mock_edinet_document, format_type  # type: ignore[arg-type]
+        document = adapter._convert_to_document(  # type: ignore[reportPrivateUsage]
+            mock_edinet_document,  # type: ignore[arg-type]
+            format_type,
         )
 
         assert document is None
@@ -412,13 +422,13 @@ class TestEdinetAdapter:
 
         assert document is None
 
-    def test_convert_to_document_handles_missing_fields(
+    def test_convert_to_document_handles_missing_sec_code(
         self, adapter: EdinetAdapter
     ) -> None:
-        """オプションフィールドが欠落している場合でもドキュメントを生成できる"""
+        """secCodeが欠落している場合はNoneを返す"""
         edinet_doc = {
             "docID": "S100TEST",
-            # "docDescription": None,  # 欠落
+            "docDescription": "有価証券報告書",
             # "secCode": None,  # 欠落
             "docTypeCode": "120",
             "submitDateTime": "2024-03-15 09:00",
@@ -430,9 +440,29 @@ class TestEdinetAdapter:
 
         document = adapter._convert_to_document(edinet_doc, format_type)  # type: ignore[reportPrivateUsage,arg-type]
 
+        # secCodeが欠落している場合はNoneが返される
+        assert document is None
+
+    def test_convert_to_document_handles_missing_doc_description(
+        self, adapter: EdinetAdapter
+    ) -> None:
+        """docDescriptionが欠落している場合でもドキュメントを生成できる"""
+        edinet_doc = {
+            "docID": "S100TEST",
+            # "docDescription": None,  # 欠落
+            "secCode": "12345",
+            "docTypeCode": "120",
+            "submitDateTime": "2024-03-15 09:00",
+            "xbrlFlag": "1",
+            "pdfFlag": "1",
+            "csvFlag": "0",
+        }
+        format_type = FormatType(enum=FormatTypeEnum.XBRL)
+
+        document = adapter._convert_to_document(edinet_doc, format_type)  # type: ignore[reportPrivateUsage,arg-type]
+
         assert document is not None
-        assert document.filing_name == ""
-        assert document.ticker.value == "UNKNOWN"
+        assert document.filing_name == "UNKNOWN"
 
     def test_convert_to_document_handles_invalid_date(
         self, adapter: EdinetAdapter
@@ -495,7 +525,9 @@ class TestEdinetAdapter:
         assert amended_quarterly is not None
         assert amended_quarterly.enum == DisclosureTypeEnum.AMENDED_QUARTERLY_REPORT
 
-    def test_map_disclosure_type_all_supported_codes(self, adapter: EdinetAdapter) -> None:
+    def test_map_disclosure_type_all_supported_codes(
+        self, adapter: EdinetAdapter
+    ) -> None:
         """すべてのサポートされているコードをテスト"""
         mappings = {
             "120": DisclosureTypeEnum.ANNUAL_REPORT,
@@ -565,4 +597,3 @@ class TestEdinetAdapter:
         format_types = adapter._map_format_type(None, None, None)  # type: ignore[reportPrivateUsage]
         assert len(format_types) == 1
         assert format_types[0].enum == FormatTypeEnum.OTHER
-
