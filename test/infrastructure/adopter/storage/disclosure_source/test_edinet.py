@@ -432,7 +432,7 @@ class TestEdinetAdapter:
 
         assert document is not None
         assert document.filing_name == ""
-        assert document.ticker.value == ""
+        assert document.ticker.value == "UNKNOWN"
 
     def test_convert_to_document_handles_invalid_date(
         self, adapter: EdinetAdapter
